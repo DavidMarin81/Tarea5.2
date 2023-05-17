@@ -20,4 +20,16 @@ public class ServicioDepartamento implements IServicioDepartamento {
 		return departamentoDao.read(deptno);
 	}
 
+
+
+	@Override
+	public Departamento readByName(String dname) throws InstanceNotFoundException {
+		return departamentoDao.readByName(dname);
+	}
+
+	@Override
+	public int getTotalDepartamentos() {
+		return departamentoDao.getTotalDepartamentos();
+	}
+
 }

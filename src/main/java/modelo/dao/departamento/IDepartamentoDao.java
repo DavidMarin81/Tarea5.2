@@ -7,6 +7,7 @@ package modelo.dao.departamento;
 
 import modelo.Departamento;
 import modelo.dao.IGenericDao;
+import modelo.exceptions.InstanceNotFoundException;
 
 /**
  *
@@ -18,6 +19,6 @@ public interface IDepartamentoDao extends IGenericDao<Departamento>{
 	
 	public boolean exists(Integer dept);
 	
-	
+	public int getTotalDepartamentos();
 	
 }

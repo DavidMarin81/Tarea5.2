@@ -32,6 +32,9 @@ public interface IGenericDao<E> {
      * @throws InstanceNotFoundException si no encuentra la entidad
      */
     public E read(long id) throws InstanceNotFoundException;
+    
+    // Se crea el metodo que buscará por DNOMBRE
+    public E readByName(String dname) throws InstanceNotFoundException;
 
     
     /***

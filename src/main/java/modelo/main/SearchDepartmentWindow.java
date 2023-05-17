@@ -38,6 +38,7 @@ public class SearchDepartmentWindow extends JFrame {
 	private IServicioDepartamento departamentoServicio;
 
 	private JTextField textField_deptNo;
+	private JTextField textField_Nombre;
 
 	/**
 	 * Launch the application.
@@ -109,6 +110,7 @@ public class SearchDepartmentWindow extends JFrame {
 				} else {
 					try {
 						Departamento dept = departamentoServicio.read(deptno);
+						
 						if (dept != null) {
 
 							addMensaje(true, "Se ha encontrado el departamento con id: " + deptno);
@@ -139,6 +141,50 @@ public class SearchDepartmentWindow extends JFrame {
 		lbal_info_deptno.setFont(new Font("Tahoma", Font.PLAIN, 16));
 		lbal_info_deptno.setBounds(10, 11, 280, 34);
 		panel.add(lbal_info_deptno);
+		
+		JLabel lbal_info_deptno_1 = new JLabel("Introduzca el nombre de departamento");
+		lbal_info_deptno_1.setFont(new Font("Tahoma", Font.PLAIN, 16));
+		lbal_info_deptno_1.setBounds(10, 116, 280, 34);
+		panel.add(lbal_info_deptno_1);
+		
+		textField_Nombre = new JTextField();
+		textField_Nombre.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				addMensaje(true, "Procesando...");
+				//Se pasa el nombre introducido a mayusculas
+				String dname = getDnameFromTextField().toUpperCase();
+				if (dname.equals("")) {
+
+					addMensaje(true, "El nombre del departamento no puede estar vacio");
+				} else {
+					try {
+						Departamento dept = departamentoServicio.readByName(dname);
+						if (dept != null) {
+
+							addMensaje(true, "Se ha encontrado el departamento con nombre: " + dname);
+							addMensaje(true, "Total departamentos con nombre: " + dname + " = " + departamentoServicio.getTotalDepartamentos());
+							DefaultListModel<Departamento> defModel = new DefaultListModel<>();
+
+							defModel.addElement(dept);
+
+							JListAllDepts.setModel(defModel);
+						} else {
+							addMensaje(true, "El departamento con nombre: " + dname + " es null");
+							clearJListModel();
+
+						}
+					} catch (InstanceNotFoundException e1) {
+
+						addMensaje(true, "El departamento con nombre: " + dname + " no existe");
+						clearJListModel();
+
+					}
+				}
+			}
+		});
+		textField_Nombre.setColumns(10);
+		textField_Nombre.setBounds(10, 161, 263, 34);
+		panel.add(textField_Nombre);
 
 	}
 	
@@ -172,5 +218,15 @@ public class SearchDepartmentWindow extends JFrame {
 		}
 		return deptno;
 	}
-
+	
+	private String getDnameFromTextField() {
+		String dname = "";
+		String textIntroducido = textField_Nombre.getText().trim();
+		try {
+			dname = textIntroducido;
+		} catch (Exception nfe) {
+			dname = "";
+		}
+		return dname;
+	}
 }

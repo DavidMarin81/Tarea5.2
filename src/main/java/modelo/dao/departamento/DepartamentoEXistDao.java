@@ -43,6 +43,14 @@ public class DepartamentoEXistDao extends AbstractGenericDao<Departamento> imple
 	private static final String LOC_TAG = "LOC";
 	private MyDataSource dataSource;
 
+	//Se pasa el numero de departamentos encontrados
+	private int contador = 0;
+	
+	//Se crea un getter para pasar el total de los departamentos encontrados
+	public int getTotalDepartamentos() {
+		return contador;
+	}
+
 	public DepartamentoEXistDao() {
 		this.dataSource = ConnectionManager.getDataSource();
 		Class cl;
@@ -87,6 +95,55 @@ public class DepartamentoEXistDao extends AbstractGenericDao<Departamento> imple
 			if (result.getSize() == 0)
 				throw new InstanceNotFoundException(id, Departamento.class.getName());
 
+			ResourceIterator i = result.getIterator();
+			Resource res = null;
+			while (i.hasMoreResources()) {
+				try {
+					res = i.nextResource();
+
+					System.out.println(res.getContent().toString());
+
+					departamento = stringNodeToDepartamento(res.getContent().toString());
+
+				} finally {
+					// dont forget to cleanup resources
+					try {
+						((EXistResource) res).freeResources();
+					} catch (XMLDBException xe) {
+						departamento = null;
+						xe.printStackTrace();
+					}
+				}
+			}
+
+		} catch (XMLDBException e) {
+			departamento = null;
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return departamento;
+	}
+	
+	@Override
+	public Departamento readByName(String dname) throws InstanceNotFoundException {
+		Departamento departamento = null;
+		try (Collection col = DatabaseManager.getCollection(dataSource.getUrl() + dataSource.getColeccionDepartamentos(),
+				dataSource.getUser(), dataSource.getPwd())) {
+
+			XQueryService xqs = (XQueryService) col.getService("XQueryService", "1.0");
+			xqs.setProperty("indent", "yes");
+
+			CompiledExpression compiled = xqs.compile("//DEP_ROW[DNOMBRE='" + dname + "']");
+			ResourceSet result = xqs.execute(compiled);
+			
+			
+
+			if (result.getSize() == 0)
+				throw new InstanceNotFoundException(dname, Departamento.class.getName());
+			
+			//Se le da valor al contador -> getSize() devuelve un long
+			contador = (int) result.getSize();
+			
 			ResourceIterator i = result.getIterator();
 			Resource res = null;
 			while (i.hasMoreResources()) {
@@ -200,10 +257,4 @@ public class DepartamentoEXistDao extends AbstractGenericDao<Departamento> imple
 	}
 
 	
-
-	
-
-
-
-
 }
